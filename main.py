@@ -5,6 +5,8 @@ from kivy.properties import StringProperty, ListProperty
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.list import OneLineIconListItem, MDList
+from kivymd.uix.tab import MDTabsBase
+from kivymd.uix.floatlayout import MDFloatLayout
 
 KV = '''
 <ItemDrawer>:
@@ -50,6 +52,12 @@ KV = '''
             id: md_list
 
 
+<Tab>:
+    MDLabel:
+        text: root.title
+        halign: "center"
+
+
 Screen:
     MDNavigationLayout:
 
@@ -64,9 +72,8 @@ Screen:
                         elevation: 10
                         left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
 
-                    Widget:
-                    MDTextField:
-                             hint_text: "No helper text"
+                    MDTabs:
+                        id: tabs
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -74,6 +81,10 @@ Screen:
             ContentNavigationDrawer:
                 id: content_drawer
 '''
+
+
+class Tab(MDFloatLayout, MDTabsBase):
+    title = StringProperty("")
 
 
 class ContentNavigationDrawer(BoxLayout):
@@ -95,6 +106,8 @@ class DrawerList(ThemableBehavior, MDList):
 
 class MortgageCalculatorApp(MDApp):
     def build(self):
+        self.theme_cls.primary_palette = "Orange"
+        self.theme_cls.theme_style = "Light"
         return Builder.load_string(KV)
 
     def on_start(self):
@@ -103,13 +116,18 @@ class MortgageCalculatorApp(MDApp):
             "account-multiple": "Shared with me",
             "star": "Starred",
             "history": "Recent",
-            "checkbox-marked": "Shared with me",
+            "checkbox-marked": "Checked",
             "upload": "Upload",
         }
 
         for icon_name, item_text in icons_item.items():
             self.root.ids.content_drawer.ids.md_list.add_widget(
                 ItemDrawer(icon=icon_name, text=item_text)
+            )
+
+        for icon_name, name_tab in icons_item.items():
+            self.root.ids.tabs.add_widget(
+                Tab(icon=icon_name, title=name_tab)
             )
 
 
